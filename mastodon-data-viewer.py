@@ -471,6 +471,7 @@ def main():
 	parser.add_argument("--force-update", "-r", default=False, help="Forces rebuild of the toots.pk cache file", action='store_true')
 	parser.add_argument("--dont-update", "-u", default=False, help="Does not update the toots cache with data files", action='store_true')
 	parser.add_argument("--use-outbox", "-o", default=False, help="Uses outbox.json file regardless of the contents of actor.json", action='store_true')
+	parser.add_argument("--darkmode-default", "-k", default=False, help="Enables darkmode by default", action='store_true')
 	args = parser.parse_args()
 
 	if not path.isdir(args.archive):
@@ -544,7 +545,10 @@ def main():
 				self.send_header("Content-type", "text/html")
 				self.end_headers()
 				query_components = parse_qs(parsedpath.query)
-				darkmode = "dark" in query_components and query_components["dark"][0] == "yes"
+				if "dark" in query_components:
+					darkmode = query_components["dark"][0] != "no"
+				else:
+					darkmode = args.darkmode_default
 				search = "search" in query_components
 				date = None
 				searchtext = ""
